@@ -14,6 +14,20 @@ char* padString(char *str, int length) {
   return newStr;
 }
 
+float* sortSales(float sales[12]) {
+  float temp;
+  for (int i = 0; i < 12; i++) {
+    for (int j = i + 1; j < 12; j++) {
+      if (sales[i] < sales[j]) {
+        temp = sales[i];
+        sales[i] = sales[j];
+        sales[j] = temp;
+      }
+    }
+  }
+  return sales;
+}
+
 void printMonthlySalesReport(float sales[12], char *months[12]) {
   printf("Monthly sales report for 2022:\n");
   printf("\n");
@@ -48,9 +62,9 @@ void printSalesSummary(float sales[12], char *months[12]) {
   printf("Average sales: $%.2f\n", average);
 }
 
-int getSixMonthMovingAverage(int sales[12], int start):
+float getSixMonthMovingAverage(float sales[12], int start)
 {
-  int average = 0;
+  float average = 0;
   for (int i = start; i < start + 6; i++) {
     average += sales[i] / 6;
   }
@@ -59,8 +73,8 @@ int getSixMonthMovingAverage(int sales[12], int start):
 
 void printSixMonthMovingAverage(float sales[12], char *months[12]) {
   printf("Six-Month Moving Average Report:\n");
-  for (int i = 0; i < 6; i++) {
-    printf("%s\t- $%.2f\n", months[i], getSixMonthMovingAverage(sales, i));
+  for (int i = 0; i <= 6; i++) {
+    printf("%s-\t%s $%.2f\n", padString(months[i], 10), padString(months[i + 5], 10), getSixMonthMovingAverage(sales, i));
   }
 }
 
@@ -82,6 +96,7 @@ int main() {
   printMonthlySalesReport(sales, months);
   printf("\n");
   printSalesSummary(sales, months);
+  printf("\n");
   printSixMonthMovingAverage(sales, months);
   // printSalesReportSorted(sales);
 }
