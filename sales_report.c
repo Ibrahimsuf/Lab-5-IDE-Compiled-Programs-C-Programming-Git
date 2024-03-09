@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* padString(char *str, int length) {
+char* padString(const char *str, const int length) {
   char *newStr = malloc(length + 1);
   for (int i = 0; i < strlen(str); i++) {
     newStr[i] = str[i];
@@ -14,21 +14,54 @@ char* padString(char *str, int length) {
   return newStr;
 }
 
-float* sortSales(float sales[12]) {
-  float temp;
+void sortSales(const float sales[12], const char* months[12], float* sorted_sales_ptr, char** sorted_months_ptr) {
+  // sort sales and months and assign them to sorted_sales and sorted_months pointers
+  float sorted_sales[12];
+  char* sorted_months[12];
+  float temp_sales;
+  char* temp_month;
+
+  // copy sales into sorted_sales and months into sorted_months
+  for (int i = 0; i < 12; i++) {
+    sorted_sales[i] = sales[i];
+    sorted_months[i] = malloc(10);
+    strcpy(sorted_months[i], months[i]);
+  }
+  // sort sales into descending order, and sort months accordingly
   for (int i = 0; i < 12; i++) {
     for (int j = i + 1; j < 12; j++) {
-      if (sales[i] < sales[j]) {
-        temp = sales[i];
-        sales[i] = sales[j];
-        sales[j] = temp;
+      if (sorted_sales[i] < sorted_sales[j]) {
+        temp_sales = sales[i];
+        temp_month = malloc(10);
+        strcpy(temp_month, months[i]);
+        sorted_sales[i] = sorted_sales[j];
+        sorted_months[i] = sorted_months[j];
+        sorted_sales[j] = temp_sales;
+        sorted_months[j] = temp_month;
       }
     }
   }
-  return sales;
+  
+  sorted_months_ptr = sorted_months;
+  sorted_sales_ptr = sorted_sales;
 }
 
-void printMonthlySalesReport(float sales[12], char *months[12]) {
+void printSalesReportSorted(const float sales[12], const char *months[12]) {
+  float* sorted_sales_ptr;
+  char** sorted_months_ptr;
+  sortSales(sales, months, sorted_sales_ptr, sorted_months_ptr);
+
+
+  printf("Sales Report (Highest to Lowest):\n");
+  printf("\n");
+  printf("Month     Sales\n");
+  for (int i = 0; i < 12; i++) {
+    char* month = padString(sorted_months_ptr[i], 10);
+    printf("%s $%.2f\n", month, sorted_sales_ptr[i]);
+  }
+}
+
+void printMonthlySalesReport(const float sales[12], const char *months[12]) {
   printf("Monthly sales report for 2022:\n");
   printf("\n");
   printf("Month     Sales\n");
@@ -38,7 +71,7 @@ void printMonthlySalesReport(float sales[12], char *months[12]) {
   }
 }
 
-void printSalesSummary(float sales[12], char *months[12]) {
+void printSalesSummary(const float sales[12], const char *months[12]) {
   float average = sales[0] / 12;
   float max = sales[0];
   int max_month = 0;
@@ -62,7 +95,7 @@ void printSalesSummary(float sales[12], char *months[12]) {
   printf("Average sales: $%.2f\n", average);
 }
 
-float getSixMonthMovingAverage(float sales[12], int start)
+float getSixMonthMovingAverage(const float sales[12], const int start)
 {
   float average = 0;
   for (int i = start; i < start + 6; i++) {
@@ -71,7 +104,7 @@ float getSixMonthMovingAverage(float sales[12], int start)
   return average;
 }
 
-void printSixMonthMovingAverage(float sales[12], char *months[12]) {
+void printSixMonthMovingAverage(const float sales[12], const char *months[12]) {
   printf("Six-Month Moving Average Report:\n");
   for (int i = 0; i <= 6; i++) {
     printf("%s-\t%s $%.2f\n", padString(months[i], 10), padString(months[i + 5], 10), getSixMonthMovingAverage(sales, i));
@@ -91,14 +124,15 @@ int main() {
 
   fclose(fptr);
 
-  char *months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+  const char *months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
   printMonthlySalesReport(sales, months);
   printf("\n");
   printSalesSummary(sales, months);
   printf("\n");
   printSixMonthMovingAverage(sales, months);
-  // printSalesReportSorted(sales);
+  printf("\n");
+  printSalesReportSorted(sales, months);
 }
 
 
