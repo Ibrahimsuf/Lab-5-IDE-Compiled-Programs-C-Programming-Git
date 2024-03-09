@@ -14,42 +14,40 @@ char* padString(const char *str, const int length) {
   return newStr;
 }
 
-void sortSales(const float sales[12], const char* months[12], float* sorted_sales_ptr, char** sorted_months_ptr) {
+void sortSales(const float sales[12], const char* months[12], float** sorted_sales_ptr, char*** sorted_months_ptr) {
   // sort sales and months and assign them to sorted_sales and sorted_months pointers
-  float sorted_sales[12];
-  char* sorted_months[12];
+  *sorted_sales_ptr = malloc(12 * sizeof(float));
+  *sorted_months_ptr = malloc(12 * sizeof(char*));
   float temp_sales;
   char* temp_month;
 
   // copy sales into sorted_sales and months into sorted_months
   for (int i = 0; i < 12; i++) {
-    sorted_sales[i] = sales[i];
-    sorted_months[i] = malloc(10);
-    strcpy(sorted_months[i], months[i]);
+    (*sorted_sales_ptr)[i] = sales[i];
+    (*sorted_months_ptr)[i] = malloc(10);
+    strcpy((*sorted_months_ptr)[i], months[i]);
   }
   // sort sales into descending order, and sort months accordingly
   for (int i = 0; i < 12; i++) {
     for (int j = i + 1; j < 12; j++) {
-      if (sorted_sales[i] < sorted_sales[j]) {
-        temp_sales = sales[i];
+      if ((*sorted_sales_ptr)[i] < (*sorted_sales_ptr)[j]) {
+        temp_sales = (*sorted_sales_ptr)[i];
         temp_month = malloc(10);
-        strcpy(temp_month, months[i]);
-        sorted_sales[i] = sorted_sales[j];
-        sorted_months[i] = sorted_months[j];
-        sorted_sales[j] = temp_sales;
-        sorted_months[j] = temp_month;
+        strcpy(temp_month, (*sorted_months_ptr)[i]);
+        (*sorted_months_ptr)[i] = (*sorted_months_ptr)[j];
+        (*sorted_sales_ptr)[i] = (*sorted_sales_ptr)[j];
+        (*sorted_months_ptr)[j] = temp_month;
+        (*sorted_sales_ptr)[j] = temp_sales;
       }
     }
   }
-  
-  sorted_months_ptr = sorted_months;
-  sorted_sales_ptr = sorted_sales;
+  free(temp_month);
 }
 
 void printSalesReportSorted(const float sales[12], const char *months[12]) {
   float* sorted_sales_ptr;
   char** sorted_months_ptr;
-  sortSales(sales, months, sorted_sales_ptr, sorted_months_ptr);
+  sortSales(sales, months, &sorted_sales_ptr, &sorted_months_ptr);
 
 
   printf("Sales Report (Highest to Lowest):\n");
@@ -59,6 +57,12 @@ void printSalesReportSorted(const float sales[12], const char *months[12]) {
     char* month = padString(sorted_months_ptr[i], 10);
     printf("%s $%.2f\n", month, sorted_sales_ptr[i]);
   }
+
+  free(sorted_sales_ptr);
+  for (int i = 0; i < 12; i++) {
+      free(sorted_months_ptr[i]);
+  }
+  free(sorted_months_ptr);
 }
 
 void printMonthlySalesReport(const float sales[12], const char *months[12]) {
